@@ -1,0 +1,32 @@
+<?xml version="1.0"?>
+<robot name="simple_motor">
+  <link name="base_link">
+    <visual>
+      <geometry>
+        <cylinder length="0.5" radius="0.2"/>
+      </geometry>
+      <material name="blue">
+        <color rgba="0 0 0.8 1"/>
+      </material>
+    </visual>
+  </link>
+
+  <link name="rotor">
+    <visual>
+      <geometry>
+        <cylinder length="0.1" radius="0.05"/>
+      </geometry>
+      <origin xyz="0 0 0.3"/>
+      <material name="red">
+        <color rgba="0.8 0 0 1"/>
+      </material>
+    </visual>
+  </link>
+
+  <joint name="motor_joint" type="continuous">
+    <parent link="base_link"/>
+    <child link="rotor"/>
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+    <axis xyz="0 0 1"/>
+  </joint>
+</robot>
