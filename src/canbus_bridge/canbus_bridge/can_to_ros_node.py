@@ -4,6 +4,9 @@ import can
 import threading
 
 from canbus_msgs.msg import MotorTelemetry, AnomalyAlert
+from sensor_msgs.msg import JointState
+import math
+import time
 
 from .can_protocol import (
     decode_frame,
@@ -20,9 +23,12 @@ class CanToRosNode(Node):
         # Publishers
         self.telemetry_pub = self.create_publisher(MotorTelemetry, '/motor/telemetry', 10)
         self.anomaly_pub = self.create_publisher(AnomalyAlert, '/motor/anomaly', 10)
+        self.joint_pub = self.create_publisher(JointState, '/joint_states', 10)
         
         # Internal state
         self.telemetry = MotorTelemetry()
+        self.motor_angle = 0.0
+        self.last_time = time.time()
         
         self.get_logger().info('CAN to ROS2 Bridge Node started.')
         self.get_logger().info('Listening on UDP Multicast 239.0.0.1...')
@@ -97,6 +103,26 @@ class CanToRosNode(Node):
         # Publish the latest state
         self.telemetry_pub.publish(self.telemetry)
         
+        # Calculate motor spin (integration)
+        current_time = time.time()
+        dt = current_time - self.last_time
+        self.last_time = current_time
+        
+        # RPM to Radian per second: rad/s = RPM * 2 * pi / 60
+        angular_vel = self.telemetry.rpm * 2.0 * math.pi / 60.0
+        self.motor_angle += angular_vel * dt
+        
+        # Keep angle in [0, 2pi] roughly
+        self.motor_angle %= (2 * math.pi)
+        
+        # Publish JointState so RViz2 shows rotation
+        joint_msg = JointState()
+        joint_msg.header.stamp = self.get_clock().now().to_msg()
+        joint_msg.name = ['motor_joint']
+        joint_msg.position = [self.motor_angle]
+        joint_msg.velocity = [angular_vel]
+        self.joint_pub.publish(joint_msg)
+        
     def destroy_node(self):
         self.running = False
         if hasattr(self, 'bus'):
@@ -117,3 +143,4 @@ def main(args=None):
 
 if __name__ == '__main__':
     main()
+

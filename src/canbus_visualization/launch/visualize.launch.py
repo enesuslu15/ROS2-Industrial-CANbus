@@ -32,3 +32,4 @@ def generate_launch_description():
             arguments=['-d', rviz_file]
         )
     ])
+

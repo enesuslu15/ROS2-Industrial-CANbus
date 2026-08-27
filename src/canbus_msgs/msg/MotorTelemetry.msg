@@ -6,3 +6,4 @@ float32 current
 bool is_overheat
 bool is_overcurrent
 bool is_undervoltage
+

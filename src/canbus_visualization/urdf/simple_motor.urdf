@@ -14,9 +14,10 @@
   <link name="rotor">
     <visual>
       <geometry>
-        <cylinder length="0.1" radius="0.05"/>
+        <!-- Silindir yerine bir dikdörtgen çubuk yapalım ki döndüğü belli olsun -->
+        <box size="0.2 0.04 0.05"/>
       </geometry>
-      <origin xyz="0 0 0.3"/>
+      <origin xyz="0 0 0.25"/>
       <material name="red">
         <color rgba="0.8 0 0 1"/>
       </material>
@@ -30,3 +31,4 @@
     <axis xyz="0 0 1"/>
   </joint>
 </robot>
+
